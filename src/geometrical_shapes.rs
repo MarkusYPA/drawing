@@ -1,10 +1,12 @@
+use super::*;
+
 pub trait Drawable {
     fn draw(&self);
     fn color(&self);
 }
 
 pub trait Displayable {
-    fn display(&self);
+    fn display(&self, x: i32, y: i32, color: Color);
 }
 
 pub struct Point(pub i32, pub i32);
