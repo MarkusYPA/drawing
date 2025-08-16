@@ -177,15 +177,13 @@ impl Drawable for Line {
 
 impl Drawable for Triangle {
     fn draw<I: Displayable>(&self, image: &mut I) {
-        let color = self.color();
-        self.draw_with_color(image, color);
+        self.draw_with_color(image, self.color());
     }
 }
 
 impl Drawable for Rectangle {
     fn draw<I: Displayable>(&self, image: &mut I) {
-        let color = self.color();
-        self.draw_with_color(image, color);
+        self.draw_with_color(image, self.color());
     }
 }
 
