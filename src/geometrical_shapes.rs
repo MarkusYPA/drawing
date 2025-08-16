@@ -14,18 +14,22 @@ pub trait Displayable {
     fn display(&mut self, x: i32, y: i32, color: Color);
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Point {
     pub x: i32,
     pub y: i32,
 }
 
+#[derive(Debug)]
 pub struct Line(pub Point, pub Point);
 
+#[derive(Debug)]
 pub struct Triangle(pub Point, pub Point, pub Point);
 
+#[derive(Debug)]
 pub struct Rectangle(pub Point, pub Point);
 
+#[derive(Debug)]
 pub struct Circle {
     pub center: Point,
     pub radius: i32,
@@ -73,58 +77,95 @@ impl Circle {
     }
 
     pub fn random(max_x: i32, max_y: i32) -> Self {
-        Circle::new(&Point::random(max_x, max_y), random_range(0..=(max_x + max_y) / 3))
+        Circle::new(
+            &Point::random(max_x, max_y),
+            random_range(0..=(max_x + max_y) / 3),
+        )
     }
 }
 
+//  ======= Drawable =======
+
 impl Drawable for Point {
-    fn color(&self) -> Color {        
+    fn color(&self) -> Color {
         Color::white()
     }
 
     fn draw(&self, image: &mut Image) {
-        // image has display method, use that to draw one pixel
+        // draw one pixel
         image.display(self.x, self.y, self.color());
     }
 }
 
 impl Drawable for Line {
-    fn color(&self) -> Color {        
+    fn color(&self) -> Color {
         Color::white()
     }
 
     fn draw(&self, image: &mut Image) {
-        
+        let x_length = (self.1.x - self.0.x).abs();
+        let y_length = (self.1.y - self.0.y).abs();
+        let is_steep = y_length > x_length;
+
+        // Always go from smaller to bigger value
+        let (start, end) = if is_steep {
+            if self.0.y > self.1.y {
+                (self.1, self.0)
+            } else {
+                (self.0, self.1)
+            }
+        } else {
+            if self.0.x > self.1.x {
+                (self.1, self.0)
+            } else {
+                (self.0, self.1)
+            }
+        };
+
+        if !is_steep {
+            for x in start.x..=end.x {
+                let completion = (x as f64 - start.x as f64) / x_length as f64;
+                let y = completion * (end.y - start.y) as f64 + start.y as f64;
+                let y = y as i32;
+                image.display(x, y, self.color());
+            }
+        } else {
+            for y in self.0.y..=self.1.y {
+                let completion = (y as f64 - start.y as f64) / y_length as f64;
+                let x = completion * (end.x - start.x) as f64 + start.x as f64;
+                let x = x as i32;
+                image.display(x, y, self.color());
+            }
+        }
     }
 }
 
 impl Drawable for Triangle {
-    fn color(&self) -> Color {        
+    fn color(&self) -> Color {
         Color::white()
     }
 
     fn draw(&self, image: &mut Image) {
-        
+        // draw all lines between points
     }
 }
 
 impl Drawable for Rectangle {
-    fn color(&self) -> Color {        
+    fn color(&self) -> Color {
         Color::white()
     }
 
     fn draw(&self, image: &mut Image) {
-        
+        // work out all four points and draw lines in between
     }
 }
 
 impl Drawable for Circle {
-    fn color(&self) -> Color {        
+    fn color(&self) -> Color {
         Color::white()
     }
 
     fn draw(&self, image: &mut Image) {
-        
+        // draw points according to pythagoras
     }
 }
-
