@@ -103,9 +103,9 @@ impl Drawable for Line {
     }
 
     fn draw(&self, image: &mut Image) {
-        let x_length = (self.1.x - self.0.x).abs();
-        let y_length = (self.1.y - self.0.y).abs();
-        let is_steep = y_length > x_length;
+        let x_length = self.1.x - self.0.x;
+        let y_length = self.1.y - self.0.y;
+        let is_steep = y_length.abs() > x_length.abs();
 
         // Always go from smaller to bigger value
         let (start, end) = if is_steep {
@@ -124,17 +124,15 @@ impl Drawable for Line {
 
         if !is_steep {
             for x in start.x..=end.x {
-                let completion = (x as f64 - start.x as f64) / x_length as f64;
+                let completion = (x as f64 - start.x as f64) / (end.x - start.x) as f64;
                 let y = completion * (end.y - start.y) as f64 + start.y as f64;
-                let y = y as i32;
-                image.display(x, y, self.color());
+                image.display(x, y as i32, self.color());
             }
         } else {
-            for y in self.0.y..=self.1.y {
-                let completion = (y as f64 - start.y as f64) / y_length as f64;
+            for y in start.y..=end.y {
+                let completion = (y as f64 - start.y as f64) / (end.y - start.y) as f64;
                 let x = completion * (end.x - start.x) as f64 + start.x as f64;
-                let x = x as i32;
-                image.display(x, y, self.color());
+                image.display(x as i32, y, self.color());
             }
         }
     }
@@ -147,6 +145,9 @@ impl Drawable for Triangle {
 
     fn draw(&self, image: &mut Image) {
         // draw all lines between points
+        Line::new(&self.0, &self.1).draw(image);
+        Line::new(&self.1, &self.2).draw(image);
+        Line::new(&self.2, &self.0).draw(image);
     }
 }
 
@@ -157,6 +158,15 @@ impl Drawable for Rectangle {
 
     fn draw(&self, image: &mut Image) {
         // work out all four points and draw lines in between
+        let a = &self.0;
+        let b = &Point::new(self.0.x, self.1.y);
+        let c = &self.1;
+        let d = &Point::new(self.1.x, self.0.y);
+
+        Line::new(a, b).draw(image);
+        Line::new(b, c).draw(image);
+        Line::new(c, d).draw(image);
+        Line::new(d, a).draw(image);
     }
 }
 
