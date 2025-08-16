@@ -9,45 +9,49 @@ pub trait Displayable {
     fn display(&self, x: i32, y: i32, color: Color);
 }
 
-pub struct Point(pub i32, pub i32);
+#[derive(Clone, Debug, Copy)]
+pub struct Point {
+    pub x: i32, 
+    pub y: i32
+}
 
-pub struct Line<'a>(pub &'a Point, pub &'a Point);
+pub struct Line(pub Point, pub Point);
 
-pub struct Triangle<'a>(pub &'a Point, pub &'a Point, pub &'a Point);
+pub struct Triangle(pub Point, pub Point, pub Point);
 
-pub struct Rectangle<'a>(pub &'a Point, pub &'a Point);
+pub struct Rectangle(pub Point, pub Point);
 
-pub struct Circle<'a> {
-    pub center: &'a Point,
+pub struct Circle {
+    pub center: Point,
     pub radius: i32,
 }
 
 impl Point {
     pub fn new(x: i32, y: i32) -> Self {
-        Self(x, y)
+        Self{x, y}
     }
 }
 
-impl<'a> Line<'a> {
-    pub fn new(a: &'a Point, b: &'a Point) -> Self {
-        Self(a, b)
+impl Line {
+    pub fn new(a: &Point, b: &Point) -> Self {
+        Self(a.clone(), b.clone())
     }
 }
 
-impl<'a> Triangle <'a>{
-    pub fn new(a: &'a Point, b: &'a Point, c: &'a Point) -> Self {
-        Self(a, b, c)
+impl Triangle {
+    pub fn new(a: &Point, b: &Point, c: &Point) -> Self {
+        Self(a.clone(), b.clone(), c.clone())
     }
 }
 
-impl<'a> Rectangle <'a>{
-    pub fn new(a: &'a Point, b: &'a Point) -> Self {
-        Self(a, b)
+impl Rectangle {
+    pub fn new(a: &Point, b: &Point) -> Self {
+        Self(a.clone(), b.clone())
     }
 }
 
-impl<'a> Circle <'a> {
-    pub fn new(center: &'a Point, radius: i32) -> Self {
-        Self{center, radius}
+impl Circle  {
+    pub fn new(center: &Point, radius: i32) -> Self {
+        Self{center: center.clone(), radius}
     }
 }
