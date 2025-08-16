@@ -1,4 +1,5 @@
 use super::*;
+use rand::{random_range, rng};
 
 pub trait Drawable {
     fn draw(&self);
@@ -11,8 +12,8 @@ pub trait Displayable {
 
 #[derive(Clone, Debug, Copy)]
 pub struct Point {
-    pub x: i32, 
-    pub y: i32
+    pub x: i32,
+    pub y: i32,
 }
 
 pub struct Line(pub Point, pub Point);
@@ -28,13 +29,21 @@ pub struct Circle {
 
 impl Point {
     pub fn new(x: i32, y: i32) -> Self {
-        Self{x, y}
+        Self { x, y }
+    }
+
+    pub fn random(max_x: i32, max_y: i32) -> Self {
+        Point::new(random_range(0..=max_x), random_range(0..=max_y))
     }
 }
 
 impl Line {
     pub fn new(a: &Point, b: &Point) -> Self {
         Self(a.clone(), b.clone())
+    }
+
+    pub fn random(max_x: i32, max_y: i32) -> Self {
+        Line::new(&Point::random(max_x, max_y), &Point::random(max_x, max_y))
     }
 }
 
@@ -50,8 +59,15 @@ impl Rectangle {
     }
 }
 
-impl Circle  {
+impl Circle {
     pub fn new(center: &Point, radius: i32) -> Self {
-        Self{center: center.clone(), radius}
+        Self {
+            center: center.clone(),
+            radius,
+        }
+    }
+
+    pub fn random(max_x: i32, max_y: i32) -> Self {
+        Circle::new(&Point::random(max_x, max_y), random_range(0..=(max_x + max_y) / 3))
     }
 }
