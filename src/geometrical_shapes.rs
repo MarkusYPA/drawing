@@ -91,13 +91,13 @@ impl Line {
             for x in start.x..=end.x {
                 let completion = (x as f64 - start.x as f64) / (end.x - start.x) as f64;
                 let y = completion * (end.y - start.y) as f64 + start.y as f64;
-                image.display(x, y as i32, color.clone());
+                image.display(x, y.round() as i32, color.clone());
             }
         } else {
             for y in start.y..=end.y {
                 let completion = (y as f64 - start.y as f64) / (end.y - start.y) as f64;
                 let x = completion * (end.x - start.x) as f64 + start.x as f64;
-                image.display(x as i32, y, color.clone());
+                image.display(x.round() as i32, y, color.clone());
             }
         }
     }
@@ -186,31 +186,25 @@ impl Drawable for Rectangle {
 impl Drawable for Circle {
     fn draw<I: Displayable>(&self, image: &mut I) {
         let random_color = self.color();
+        let steps = (self.radius as f64 / (2.0 as f64).sqrt()) as i32;
 
-        // draw upper and lower quarters of circle
-        let end_x = (self.center.x as f64 + self.radius as f64 / (2.0 as f64).sqrt()) as i32;
-        for x in self.center.x..=end_x {
-            let x_now = x - self.center.x;
-            let y1 = ((self.radius.pow(2) - x_now.pow(2)) as f64).sqrt().round() as i32;
-            let y2 = y1 * -1;
+        for s in 0..=steps {
+            let offset_1 = ((self.radius.pow(2) - s.pow(2)) as f64).sqrt().round() as i32;
+            let offset_2 = offset_1 * -1;
 
-            image.display(x, y1 + self.center.y, random_color.clone());
-            image.display(x, y2 + self.center.y, random_color.clone());
-            image.display(x - x_now * 2, y1 + self.center.y, random_color.clone());
-            image.display(x - x_now * 2, y2 + self.center.y, random_color.clone());
-        }
+            // top and bottom quarters of circle
+            let x = s + self.center.x;
+            image.display(x, offset_1 + self.center.y, random_color.clone());
+            image.display(x, offset_2 + self.center.y, random_color.clone());
+            image.display(x - s * 2, offset_1 + self.center.y, random_color.clone());
+            image.display(x - s * 2, offset_2 + self.center.y, random_color.clone());
 
-        // draw left and right quarters of circle
-        let end_y = (self.center.y as f64 + self.radius as f64 / (2.0 as f64).sqrt()) as i32;
-        for y in self.center.y..=end_y {
-            let y_now = y - self.center.y;
-            let x1 = ((self.radius.pow(2) - y_now.pow(2)) as f64).sqrt().round() as i32;
-            let x2 = x1 * -1;
-
-            image.display(x1 + self.center.x, y, random_color.clone());
-            image.display(x2 + self.center.x, y, random_color.clone());
-            image.display(x1 + self.center.x, y - y_now * 2, random_color.clone());
-            image.display(x2 + self.center.x, y - y_now * 2, random_color.clone());
+            // left and right quarters of circle
+            let y = s + self.center.y;
+            image.display(offset_1 + self.center.x, y, random_color.clone());
+            image.display(offset_2 + self.center.x, y, random_color.clone());
+            image.display(offset_1 + self.center.x, y - s * 2, random_color.clone());
+            image.display(offset_2 + self.center.x, y - s * 2, random_color.clone());
         }
     }
 }
