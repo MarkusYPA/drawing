@@ -12,7 +12,7 @@ fn random_color() -> Color {
 //  ======= Traits =======
 
 pub trait Drawable {
-    fn draw(&self, image: &mut Image);
+    fn draw<I: Displayable>(&self, image: &mut I);
 
     fn color(&self) -> Color {
         random_color()
@@ -67,7 +67,7 @@ impl Line {
         Line::new(&Point::random(max_x, max_y), &Point::random(max_x, max_y))
     }
 
-    fn draw_with_color(&self, image: &mut Image, color: Color) {
+    fn draw_with_color<I: Displayable>(&self, image: &mut I, color: Color) {
         let x_length = self.1.x - self.0.x;
         let y_length = self.1.y - self.0.y;
         let is_steep = y_length.abs() > x_length.abs();
@@ -116,7 +116,7 @@ impl Triangle {
         )
     }
 
-    fn draw_with_color(&self, image: &mut Image, color: Color) {
+    fn draw_with_color<I: Displayable>(&self, image: &mut I, color: Color) {
         Line::new(&self.0, &self.1).draw_with_color(image, color.clone());
         Line::new(&self.1, &self.2).draw_with_color(image, color.clone());
         Line::new(&self.2, &self.0).draw_with_color(image, color.clone());
@@ -132,7 +132,7 @@ impl Rectangle {
         Rectangle::new(&Point::random(max_x, max_y), &Point::random(max_x, max_y))
     }
 
-    fn draw_with_color(&self, image: &mut Image, color: Color) {
+    fn draw_with_color<I: Displayable>(&self, image: &mut I, color: Color) {
         let a = &self.0;
         let b = &Point::new(self.0.x, self.1.y);
         let c = &self.1;
@@ -164,33 +164,33 @@ impl Circle {
 //  ======= Implement Drawable =======
 
 impl Drawable for Point {
-    fn draw(&self, image: &mut Image) {
+    fn draw<I: Displayable>(&self, image: &mut I) {
         image.display(self.x, self.y, self.color());
     }
 }
 
 impl Drawable for Line {
-    fn draw(&self, image: &mut Image) {
+    fn draw<I: Displayable>(&self, image: &mut I) {
         self.draw_with_color(image, self.color());
     }
 }
 
 impl Drawable for Triangle {
-    fn draw(&self, image: &mut Image) {
+    fn draw<I: Displayable>(&self, image: &mut I) {
         let color = self.color();
         self.draw_with_color(image, color);
     }
 }
 
 impl Drawable for Rectangle {
-    fn draw(&self, image: &mut Image) {
+    fn draw<I: Displayable>(&self, image: &mut I) {
         let color = self.color();
         self.draw_with_color(image, color);
     }
 }
 
 impl Drawable for Circle {
-    fn draw(&self, image: &mut Image) {
+    fn draw<I: Displayable>(&self, image: &mut I) {
         let color = self.color();
 
         // draw upper and lower quarters of circle
