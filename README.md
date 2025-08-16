@@ -1,8 +1,8 @@
 # Drawing in Rust
 
-This project is a Rust implementation of a simple shape-drawing system that generates a **1000×1000 PNG image** containing a variety of colorful shapes — rectangles, triangles, circles, lines, and points — randomly placed or defined in code.
+This project is a Rust implementation of a simple shape-drawing system that generates a png image containing a variety of colorful shapes — rectangles, triangles, circles, lines, and points — randomly placed or defined in code.
 
-The shapes are drawn using thin colored lines on a **black background**, with some shapes partially extending beyond the image boundaries, creating an abstract overlapping effect.
+The shapes are drawn using thin colored lines creating an abstract overlapping effect.
 
 ---
 
@@ -18,7 +18,6 @@ The shapes are drawn using thin colored lines on a **black background**, with so
   * `Triangle`
   * `Rectangle`
   * `Circle`
-  * *(Bonus: Pentagon, Cube — optional)*
 
 ---
 
@@ -34,15 +33,11 @@ The shapes are drawn using thin colored lines on a **black background**, with so
   * `Point::new(x, y)`
   * `Line::new(&point_a, &point_b)`
   * `Triangle::new(&p1, &p2, &p3)`
-  * `Rectangle::new(&top_left, &bottom_right)`
+  * `Rectangle::new(&corner1, &corner2)`
   * `Circle::new(&center, radius)`
 
 * **Random Generators**
-  The following shapes include a `random(width, height)` associated function:
-
-  * `Point`
-  * `Line`
-  * `Circle`
+  The all shapes include a `random(max x, max y)` associated function.
 
 * **Image Output**
   The final image is saved as `image.png` in the project root.
@@ -95,3 +90,8 @@ The generated image will contain:
 * A black background.
 * Many overlapping shapes in random colors.
 * Lines, rectangles, triangles, circles, and points.
+
+## Authors
+
+- [Roope Hongisto](https://github.com/RuBoMa)
+- [Markus Amberla](https://github.com/MarkusYPA)
