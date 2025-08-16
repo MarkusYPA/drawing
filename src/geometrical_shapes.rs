@@ -1,16 +1,20 @@
 use super::*;
 use rand::random_range;
 
+// enum for colors (white, red, purple, ...)?
+// to pick them randomly with random range?
+// Red: Color(255, 0 ,0 , 255),
+
 pub trait Drawable {
     fn draw(&self, image: &mut Image);
-    fn color(&self);
+    fn color(&self) -> Color;
 }
 
 pub trait Displayable {
     fn display(&mut self, x: i32, y: i32, color: Color);
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Point {
     pub x: i32,
     pub y: i32,
@@ -40,6 +44,7 @@ impl Point {
 impl Line {
     pub fn new(a: &Point, b: &Point) -> Self {
         Self(a.clone(), b.clone())
+        //Self(*a, *b)  // alternative way
     }
 
     pub fn random(max_x: i32, max_y: i32) -> Self {
@@ -73,18 +78,19 @@ impl Circle {
 }
 
 impl Drawable for Point {
-    fn color(&self) {
-        
+    fn color(&self) -> Color {        
+        Color::white()
     }
 
     fn draw(&self, image: &mut Image) {
-        
+        // image has display method, use that to draw one pixel
+        image.display(self.x, self.y, self.color());
     }
 }
 
 impl Drawable for Line {
-    fn color(&self) {
-        
+    fn color(&self) -> Color {        
+        Color::white()
     }
 
     fn draw(&self, image: &mut Image) {
@@ -93,8 +99,8 @@ impl Drawable for Line {
 }
 
 impl Drawable for Triangle {
-    fn color(&self) {
-        
+    fn color(&self) -> Color {        
+        Color::white()
     }
 
     fn draw(&self, image: &mut Image) {
@@ -103,8 +109,8 @@ impl Drawable for Triangle {
 }
 
 impl Drawable for Rectangle {
-    fn color(&self) {
-        
+    fn color(&self) -> Color {        
+        Color::white()
     }
 
     fn draw(&self, image: &mut Image) {
@@ -113,8 +119,8 @@ impl Drawable for Rectangle {
 }
 
 impl Drawable for Circle {
-    fn color(&self) {
-        
+    fn color(&self) -> Color {        
+        Color::white()
     }
 
     fn draw(&self, image: &mut Image) {
