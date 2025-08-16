@@ -115,12 +115,6 @@ impl Triangle {
             &Point::random(max_x, max_y),
         )
     }
-
-    fn draw_with_color<I: Displayable>(&self, image: &mut I, color: Color) {
-        Line::new(&self.0, &self.1).draw_with_color(image, color.clone());
-        Line::new(&self.1, &self.2).draw_with_color(image, color.clone());
-        Line::new(&self.2, &self.0).draw_with_color(image, color.clone());
-    }
 }
 
 impl Rectangle {
@@ -130,18 +124,6 @@ impl Rectangle {
 
     pub fn random(max_x: i32, max_y: i32) -> Self {
         Rectangle::new(&Point::random(max_x, max_y), &Point::random(max_x, max_y))
-    }
-
-    fn draw_with_color<I: Displayable>(&self, image: &mut I, color: Color) {
-        let a = &self.0;
-        let b = &Point::new(self.0.x, self.1.y);
-        let c = &self.1;
-        let d = &Point::new(self.1.x, self.0.y);
-
-        Line::new(a, b).draw_with_color(image, color.clone());
-        Line::new(b, c).draw_with_color(image, color.clone());
-        Line::new(c, d).draw_with_color(image, color.clone());
-        Line::new(d, a).draw_with_color(image, color.clone());
     }
 }
 
@@ -177,19 +159,33 @@ impl Drawable for Line {
 
 impl Drawable for Triangle {
     fn draw<I: Displayable>(&self, image: &mut I) {
-        self.draw_with_color(image, self.color());
+        let random_color = self.color();
+
+        Line::new(&self.0, &self.1).draw_with_color(image, random_color.clone());
+        Line::new(&self.1, &self.2).draw_with_color(image, random_color.clone());
+        Line::new(&self.2, &self.0).draw_with_color(image, random_color.clone());
     }
 }
 
 impl Drawable for Rectangle {
     fn draw<I: Displayable>(&self, image: &mut I) {
-        self.draw_with_color(image, self.color());
+        let random_color = self.color();
+
+        let a = &self.0;
+        let b = &Point::new(self.0.x, self.1.y);
+        let c = &self.1;
+        let d = &Point::new(self.1.x, self.0.y);
+
+        Line::new(a, b).draw_with_color(image, random_color.clone());
+        Line::new(b, c).draw_with_color(image, random_color.clone());
+        Line::new(c, d).draw_with_color(image, random_color.clone());
+        Line::new(d, a).draw_with_color(image, random_color.clone());
     }
 }
 
 impl Drawable for Circle {
     fn draw<I: Displayable>(&self, image: &mut I) {
-        let color = self.color();
+        let random_color = self.color();
 
         // draw upper and lower quarters of circle
         let (start_x, end_x) = (
@@ -201,8 +197,8 @@ impl Drawable for Circle {
             let y1 = ((self.radius.pow(2) - x_now.pow(2)) as f64).sqrt();
             let y2 = y1 * -1.0;
 
-            image.display(x, y1.round() as i32 + self.center.y, color.clone());
-            image.display(x, y2.round() as i32 + self.center.y, color.clone());
+            image.display(x, y1.round() as i32 + self.center.y, random_color.clone());
+            image.display(x, y2.round() as i32 + self.center.y, random_color.clone());
         }
 
         // draw left and right quarters of circle
@@ -215,8 +211,8 @@ impl Drawable for Circle {
             let x1 = ((self.radius.pow(2) - y_now.pow(2)) as f64).sqrt();
             let x2 = x1 * -1.0;
 
-            image.display(x1.round() as i32 + self.center.x, y, color.clone());
-            image.display(x2.round() as i32 + self.center.x, y, color.clone());
+            image.display(x1.round() as i32 + self.center.x, y, random_color.clone());
+            image.display(x2.round() as i32 + self.center.x, y, random_color.clone());
         }
     }
 }
