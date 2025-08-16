@@ -1,15 +1,22 @@
 use super::*;
 use rand::random_range;
 
-// enum for colors (white, red, purple, ...)?
-// to pick them randomly with random range?
-// Red: Color(255, 0 ,0 , 255),
-
+fn random_color() -> Color {
+    Color {
+        r: random_range(0..=255),
+        g: random_range(0..=255),
+        b: random_range(0..=255),
+        a: 255,
+    }
+}
 //  ======= Traits =======
 
 pub trait Drawable {
     fn draw(&self, image: &mut Image);
-    fn color(&self) -> Color;
+
+    fn color(&self) -> Color {
+        random_color()
+    }
 }
 
 pub trait Displayable {
@@ -54,61 +61,13 @@ impl Point {
 impl Line {
     pub fn new(a: &Point, b: &Point) -> Self {
         Self(a.clone(), b.clone())
-        //Self(*a, *b)  // alternative way
     }
 
     pub fn random(max_x: i32, max_y: i32) -> Self {
         Line::new(&Point::random(max_x, max_y), &Point::random(max_x, max_y))
     }
-}
 
-impl Triangle {
-    pub fn new(a: &Point, b: &Point, c: &Point) -> Self {
-        Self(a.clone(), b.clone(), c.clone())
-    }
-}
-
-impl Rectangle {
-    pub fn new(a: &Point, b: &Point) -> Self {
-        Self(a.clone(), b.clone())
-    }
-}
-
-impl Circle {
-    pub fn new(center: &Point, radius: i32) -> Self {
-        Self {
-            center: center.clone(),
-            radius,
-        }
-    }
-
-    pub fn random(max_x: i32, max_y: i32) -> Self {
-        Circle::new(
-            &Point::random(max_x, max_y),
-            random_range(40..=(max_x + max_y) / 3),
-        )
-    }
-}
-
-//  ======= Implement Drawable =======
-
-impl Drawable for Point {
-    fn color(&self) -> Color {
-        Color::white()
-    }
-
-    fn draw(&self, image: &mut Image) {
-        // draw one pixel
-        image.display(self.x, self.y, self.color());
-    }
-}
-
-impl Drawable for Line {
-    fn color(&self) -> Color {
-        Color::white()
-    }
-
-    fn draw(&self, image: &mut Image) {
+    fn draw_with_color(&self, image: &mut Image, color: Color) {
         let x_length = self.1.x - self.0.x;
         let y_length = self.1.y - self.0.y;
         let is_steep = y_length.abs() > x_length.abs();
@@ -132,76 +91,122 @@ impl Drawable for Line {
             for x in start.x..=end.x {
                 let completion = (x as f64 - start.x as f64) / (end.x - start.x) as f64;
                 let y = completion * (end.y - start.y) as f64 + start.y as f64;
-                image.display(x, y as i32, self.color());
+                image.display(x, y as i32, color.clone());
             }
         } else {
             for y in start.y..=end.y {
                 let completion = (y as f64 - start.y as f64) / (end.y - start.y) as f64;
                 let x = completion * (end.x - start.x) as f64 + start.x as f64;
-                image.display(x as i32, y, self.color());
+                image.display(x as i32, y, color.clone());
             }
         }
     }
 }
 
-impl Drawable for Triangle {
-    fn color(&self) -> Color {
-        Color::white()
+impl Triangle {
+    pub fn new(a: &Point, b: &Point, c: &Point) -> Self {
+        Self(a.clone(), b.clone(), c.clone())
     }
 
-    fn draw(&self, image: &mut Image) {
-        // draw all lines between points
-        Line::new(&self.0, &self.1).draw(image);
-        Line::new(&self.1, &self.2).draw(image);
-        Line::new(&self.2, &self.0).draw(image);
+    fn draw_with_color(&self, image: &mut Image, color: Color) {
+        Line::new(&self.0, &self.1).draw_with_color(image, color.clone());
+        Line::new(&self.1, &self.2).draw_with_color(image, color.clone());
+        Line::new(&self.2, &self.0).draw_with_color(image, color.clone());
     }
 }
 
-impl Drawable for Rectangle {
-    fn color(&self) -> Color {
-        Color::white()
+impl Rectangle {
+    pub fn new(a: &Point, b: &Point) -> Self {
+        Self(a.clone(), b.clone())
     }
 
-    fn draw(&self, image: &mut Image) {
-        // work out all four points and draw lines in between
+    fn draw_with_color(&self, image: &mut Image, color: Color) {
         let a = &self.0;
         let b = &Point::new(self.0.x, self.1.y);
         let c = &self.1;
         let d = &Point::new(self.1.x, self.0.y);
 
-        Line::new(a, b).draw(image);
-        Line::new(b, c).draw(image);
-        Line::new(c, d).draw(image);
-        Line::new(d, a).draw(image);
+        Line::new(a, b).draw_with_color(image, color.clone());
+        Line::new(b, c).draw_with_color(image, color.clone());
+        Line::new(c, d).draw_with_color(image, color.clone());
+        Line::new(d, a).draw_with_color(image, color.clone());
+    }
+}
+
+impl Circle {
+    pub fn new(center: &Point, radius: i32) -> Self {
+        Self {
+            center: center.clone(),
+            radius,
+        }
+    }
+
+    pub fn random(max_x: i32, max_y: i32) -> Self {
+        Circle::new(
+            &Point::random(max_x, max_y),
+            random_range(40..=(max_x + max_y) / 3),
+        )
+    }
+}
+
+//  ======= Implement Drawable =======
+
+impl Drawable for Point {
+    fn draw(&self, image: &mut Image) {
+        image.display(self.x, self.y, self.color());
+    }
+}
+
+impl Drawable for Line {
+    fn draw(&self, image: &mut Image) {
+        self.draw_with_color(image, self.color());
+    }
+}
+
+impl Drawable for Triangle {
+    fn draw(&self, image: &mut Image) {
+        let color = self.color();
+        self.draw_with_color(image, color);
+    }
+}
+
+impl Drawable for Rectangle {
+    fn draw(&self, image: &mut Image) {
+        let color = self.color();
+        self.draw_with_color(image, color);
     }
 }
 
 impl Drawable for Circle {
-    fn color(&self) -> Color {
-        Color::white()
-    }
-
     fn draw(&self, image: &mut Image) {
-        // draw points according to Pythagoras, in two directions
+        let color = self.color();
 
-        let (start_x, end_x) = (self.center.x - self.radius, self.center.x + self.radius);
+        // draw upper and lower quarters of circle
+        let (start_x, end_x) = (
+            (self.center.x as f64 - self.radius as f64 / (2.0 as f64).sqrt()) as i32,
+            (self.center.x as f64 + self.radius as f64 / (2.0 as f64).sqrt()) as i32,
+        );
         for x in start_x..=end_x {
             let x_now = x - self.center.x;
             let y1 = ((self.radius.pow(2) - x_now.pow(2)) as f64).sqrt();
             let y2 = y1 * -1.0;
 
-            image.display(x, y1 as i32 + self.center.y, self.color());
-            image.display(x, y2 as i32 + self.center.y, self.color());
+            image.display(x, y1 as i32 + self.center.y, color.clone());
+            image.display(x, y2 as i32 + self.center.y, color.clone());
         }
 
-        let (start_y, end_y) = (self.center.y - self.radius, self.center.y + self.radius);
+        // draw left and right quarters of circle
+        let (start_y, end_y) = (
+            (self.center.y as f64 - self.radius as f64 / (2.0 as f64).sqrt()) as i32,
+            (self.center.y as f64 + self.radius as f64 / (2.0 as f64).sqrt()) as i32,
+        );
         for y in start_y..=end_y {
             let y_now = y - self.center.y;
             let x1 = ((self.radius.pow(2) - y_now.pow(2)) as f64).sqrt();
             let x2 = x1 * -1.0;
 
-            image.display(x1 as i32 + self.center.x, y, self.color());
-            image.display(x2 as i32 + self.center.x, y, self.color());
+            image.display(x1 as i32 + self.center.x, y, color.clone());
+            image.display(x2 as i32 + self.center.x, y, color.clone());
         }
     }
 }
