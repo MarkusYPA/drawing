@@ -188,31 +188,29 @@ impl Drawable for Circle {
         let random_color = self.color();
 
         // draw upper and lower quarters of circle
-        let (start_x, end_x) = (
-            (self.center.x as f64 - self.radius as f64 / (2.0 as f64).sqrt()) as i32,
-            (self.center.x as f64 + self.radius as f64 / (2.0 as f64).sqrt()) as i32,
-        );
-        for x in start_x..=end_x {
+        let end_x = (self.center.x as f64 + self.radius as f64 / (2.0 as f64).sqrt()) as i32;
+        for x in self.center.x..=end_x {
             let x_now = x - self.center.x;
-            let y1 = ((self.radius.pow(2) - x_now.pow(2)) as f64).sqrt();
-            let y2 = y1 * -1.0;
+            let y1 = ((self.radius.pow(2) - x_now.pow(2)) as f64).sqrt().round() as i32;
+            let y2 = y1 * -1;
 
-            image.display(x, y1.round() as i32 + self.center.y, random_color.clone());
-            image.display(x, y2.round() as i32 + self.center.y, random_color.clone());
+            image.display(x, y1 + self.center.y, random_color.clone());
+            image.display(x, y2 + self.center.y, random_color.clone());
+            image.display(x - x_now * 2, y1 + self.center.y, random_color.clone());
+            image.display(x - x_now * 2, y2 + self.center.y, random_color.clone());
         }
 
         // draw left and right quarters of circle
-        let (start_y, end_y) = (
-            (self.center.y as f64 - self.radius as f64 / (2.0 as f64).sqrt()) as i32,
-            (self.center.y as f64 + self.radius as f64 / (2.0 as f64).sqrt()) as i32,
-        );
-        for y in start_y..=end_y {
+        let end_y = (self.center.y as f64 + self.radius as f64 / (2.0 as f64).sqrt()) as i32;
+        for y in self.center.y..=end_y {
             let y_now = y - self.center.y;
-            let x1 = ((self.radius.pow(2) - y_now.pow(2)) as f64).sqrt();
-            let x2 = x1 * -1.0;
+            let x1 = ((self.radius.pow(2) - y_now.pow(2)) as f64).sqrt().round() as i32;
+            let x2 = x1 * -1;
 
-            image.display(x1.round() as i32 + self.center.x, y, random_color.clone());
-            image.display(x2.round() as i32 + self.center.x, y, random_color.clone());
+            image.display(x1 + self.center.x, y, random_color.clone());
+            image.display(x2 + self.center.x, y, random_color.clone());
+            image.display(x1 + self.center.x, y - y_now * 2, random_color.clone());
+            image.display(x2 + self.center.x, y - y_now * 2, random_color.clone());
         }
     }
 }
