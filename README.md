@@ -51,13 +51,14 @@ The shapes are drawn using thin colored lines on a **black background**, with so
 
 ## Dependencies
 
-This project uses the [`raster`](https://crates.io/crates/raster) crate for image creation and manipulation.
+This project uses the [`raster`](https://crates.io/crates/raster) crate for image creation and manipulation and the [`rand`](https://crates.io/crates/rand) crate for randomization.
 
 Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
 raster = "0.2"
+rand = "0.9.2"
 ```
 
 ---

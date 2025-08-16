@@ -108,6 +108,14 @@ impl Triangle {
         Self(a.clone(), b.clone(), c.clone())
     }
 
+    pub fn random(max_x: i32, max_y: i32) -> Self {
+        Triangle::new(
+            &Point::random(max_x, max_y),
+            &Point::random(max_x, max_y),
+            &Point::random(max_x, max_y),
+        )
+    }
+
     fn draw_with_color(&self, image: &mut Image, color: Color) {
         Line::new(&self.0, &self.1).draw_with_color(image, color.clone());
         Line::new(&self.1, &self.2).draw_with_color(image, color.clone());
@@ -118,6 +126,10 @@ impl Triangle {
 impl Rectangle {
     pub fn new(a: &Point, b: &Point) -> Self {
         Self(a.clone(), b.clone())
+    }
+
+    pub fn random(max_x: i32, max_y: i32) -> Self {
+        Rectangle::new(&Point::random(max_x, max_y), &Point::random(max_x, max_y))
     }
 
     fn draw_with_color(&self, image: &mut Image, color: Color) {
