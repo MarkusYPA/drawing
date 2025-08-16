@@ -5,6 +5,8 @@ use rand::random_range;
 // to pick them randomly with random range?
 // Red: Color(255, 0 ,0 , 255),
 
+//  ======= Traits =======
+
 pub trait Drawable {
     fn draw(&self, image: &mut Image);
     fn color(&self) -> Color;
@@ -13,6 +15,8 @@ pub trait Drawable {
 pub trait Displayable {
     fn display(&mut self, x: i32, y: i32, color: Color);
 }
+
+//  ======= Structs =======
 
 #[derive(Clone, Copy, Debug)]
 pub struct Point {
@@ -34,6 +38,8 @@ pub struct Circle {
     pub center: Point,
     pub radius: i32,
 }
+
+//  ======= Methods =======
 
 impl Point {
     pub fn new(x: i32, y: i32) -> Self {
@@ -79,12 +85,12 @@ impl Circle {
     pub fn random(max_x: i32, max_y: i32) -> Self {
         Circle::new(
             &Point::random(max_x, max_y),
-            random_range(0..=(max_x + max_y) / 3),
+            random_range(40..=(max_x + max_y) / 3),
         )
     }
 }
 
-//  ======= Drawable =======
+//  ======= Implement Drawable =======
 
 impl Drawable for Point {
     fn color(&self) -> Color {
@@ -176,6 +182,26 @@ impl Drawable for Circle {
     }
 
     fn draw(&self, image: &mut Image) {
-        // draw points according to pythagoras
+        // draw points according to Pythagoras, in two directions
+
+        let (start_x, end_x) = (self.center.x - self.radius, self.center.x + self.radius);
+        for x in start_x..=end_x {
+            let x_now = x - self.center.x;
+            let y1 = ((self.radius.pow(2) - x_now.pow(2)) as f64).sqrt();
+            let y2 = y1 * -1.0;
+
+            image.display(x, y1 as i32 + self.center.y, self.color());
+            image.display(x, y2 as i32 + self.center.y, self.color());
+        }
+
+        let (start_y, end_y) = (self.center.y - self.radius, self.center.y + self.radius);
+        for y in start_y..=end_y {
+            let y_now = y - self.center.y;
+            let x1 = ((self.radius.pow(2) - y_now.pow(2)) as f64).sqrt();
+            let x2 = x1 * -1.0;
+
+            image.display(x1 as i32 + self.center.x, y, self.color());
+            image.display(x2 as i32 + self.center.x, y, self.color());
+        }
     }
 }
