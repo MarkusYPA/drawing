@@ -201,8 +201,8 @@ impl Drawable for Circle {
             let y1 = ((self.radius.pow(2) - x_now.pow(2)) as f64).sqrt();
             let y2 = y1 * -1.0;
 
-            image.display(x, y1 as i32 + self.center.y, color.clone());
-            image.display(x, y2 as i32 + self.center.y, color.clone());
+            image.display(x, y1.round() as i32 + self.center.y, color.clone());
+            image.display(x, y2.round() as i32 + self.center.y, color.clone());
         }
 
         // draw left and right quarters of circle
@@ -215,8 +215,8 @@ impl Drawable for Circle {
             let x1 = ((self.radius.pow(2) - y_now.pow(2)) as f64).sqrt();
             let x2 = x1 * -1.0;
 
-            image.display(x1 as i32 + self.center.x, y, color.clone());
-            image.display(x2 as i32 + self.center.x, y, color.clone());
+            image.display(x1.round() as i32 + self.center.x, y, color.clone());
+            image.display(x2.round() as i32 + self.center.x, y, color.clone());
         }
     }
 }
