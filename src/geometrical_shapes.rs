@@ -1,16 +1,16 @@
 use super::*;
-use rand::{random_range, rng};
+use rand::random_range;
 
 pub trait Drawable {
-    fn draw(&self);
+    fn draw(&self, image: &mut Image);
     fn color(&self);
 }
 
 pub trait Displayable {
-    fn display(&self, x: i32, y: i32, color: Color);
+    fn display(&mut self, x: i32, y: i32, color: Color);
 }
 
-#[derive(Clone, Debug, Copy)]
+#[derive(Clone)]
 pub struct Point {
     pub x: i32,
     pub y: i32,
@@ -71,3 +71,54 @@ impl Circle {
         Circle::new(&Point::random(max_x, max_y), random_range(0..=(max_x + max_y) / 3))
     }
 }
+
+impl Drawable for Point {
+    fn color(&self) {
+        
+    }
+
+    fn draw(&self, image: &mut Image) {
+        
+    }
+}
+
+impl Drawable for Line {
+    fn color(&self) {
+        
+    }
+
+    fn draw(&self, image: &mut Image) {
+        
+    }
+}
+
+impl Drawable for Triangle {
+    fn color(&self) {
+        
+    }
+
+    fn draw(&self, image: &mut Image) {
+        
+    }
+}
+
+impl Drawable for Rectangle {
+    fn color(&self) {
+        
+    }
+
+    fn draw(&self, image: &mut Image) {
+        
+    }
+}
+
+impl Drawable for Circle {
+    fn color(&self) {
+        
+    }
+
+    fn draw(&self, image: &mut Image) {
+        
+    }
+}
+
