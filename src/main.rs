@@ -20,21 +20,21 @@ fn main() {
     );
     triangle.draw(&mut image); */
 
-    for _ in 0..50 {
+    for _ in 0..300 {
         gs::Point::random(image.width, image.height).draw(&mut image);
     }
 
-    for _ in 0..1 {
+    for _ in 0..2 {
         gs::Line::random(image.width, image.height).draw(&mut image);
         gs::Rectangle::random(image.width, image.height).draw(&mut image);
         gs::Triangle::random(image.width, image.height).draw(&mut image);
     }
 
-    for _ in 0..1 {
+    for _ in 0..3 {
         gs::Circle::random(image.width, image.height).draw(&mut image);
     }
 
-    for _ in 0..1 {
+    for _ in 0..3 {
         gs::Cube::random(image.width, image.height).draw(&mut image);
     }
 

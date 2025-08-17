@@ -170,6 +170,7 @@ impl Cube {
             swap(&mut diag_1, &mut diag_2);
             swap(&mut len_d1, &mut len_d2);
         }
+        let height = get_cube_height(&diag_1, &diag_2, len_d1);
 
         // Midpoint of initial parallelogram
         let m = Point::new(
@@ -186,7 +187,6 @@ impl Cube {
 
         // Angle from diag_1 and length for height lines
         let angle_3 = (angle_1 + angle_2) / 2.0;
-        let height = get_cube_height(&diag_1, &diag_2, len_d1);
         let offset = point_from_angle_and_distance(&diag_1, angle_3, height);
 
         let (a2, b2, c2, d2) = (
@@ -313,13 +313,12 @@ impl Drawable for Cube {
         let lines = vec![
             a1b1, b1c1, c1d1, d1a1, a1a2, b1b2, c1c2, d1d2, a2b2, b2c2, c2d2, d2a2,
         ];
-        for (i, l) in lines.iter().enumerate() {
+        for l in lines {
             l.draw_with_color(image, random_color.clone());
         }
     }
 }
 
-// Make these Cube methods
 fn angle_from_points(a: &Point, b: &Point, c: &Point) -> f64 {
     // Vectors ba and bc
     let bax = (a.x - b.x) as f64;
@@ -342,7 +341,6 @@ fn angle_from_points(a: &Point, b: &Point, c: &Point) -> f64 {
     cos_theta.acos() // radians in [0, PI]
 }
 
-// Point method
 fn point_from_angle_and_distance(l: &Line, a: f64, h: f64) -> Point {
     // direction of reference line
     let dx = (l.1.x - l.0.x) as f64;
