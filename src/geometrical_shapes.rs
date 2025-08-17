@@ -1,21 +1,18 @@
 use super::*;
 use rand::random_range;
 
-fn random_color() -> Color {
-    Color {
-        r: random_range(0..=255),
-        g: random_range(0..=255),
-        b: random_range(0..=255),
-        a: 255,
-    }
-}
 //  ======= Traits =======
 
 pub trait Drawable {
     fn draw<I: Displayable>(&self, image: &mut I);
 
     fn color(&self) -> Color {
-        random_color()
+        Color {
+            r: random_range(0..=255),
+            g: random_range(0..=255),
+            b: random_range(0..=255),
+            a: 255,
+        }
     }
 }
 
@@ -193,18 +190,20 @@ impl Drawable for Circle {
             let offset_2 = offset_1 * -1;
 
             // top and bottom quarters of circle
-            let x = s + self.center.x;
-            image.display(x, offset_1 + self.center.y, random_color.clone());
-            image.display(x, offset_2 + self.center.y, random_color.clone());
-            image.display(x - s * 2, offset_1 + self.center.y, random_color.clone());
-            image.display(x - s * 2, offset_2 + self.center.y, random_color.clone());
+            let x1 = self.center.x + s;
+            let x2 = self.center.x - s;
+            image.display(x1, self.center.y + offset_1, random_color.clone());
+            image.display(x1, self.center.y + offset_2, random_color.clone());
+            image.display(x2, self.center.y + offset_1, random_color.clone());
+            image.display(x2, self.center.y + offset_2, random_color.clone());
 
             // left and right quarters of circle
-            let y = s + self.center.y;
-            image.display(offset_1 + self.center.x, y, random_color.clone());
-            image.display(offset_2 + self.center.x, y, random_color.clone());
-            image.display(offset_1 + self.center.x, y - s * 2, random_color.clone());
-            image.display(offset_2 + self.center.x, y - s * 2, random_color.clone());
+            let y1 = self.center.y + s;
+            let y2 = self.center.y - s;
+            image.display(self.center.x + offset_1, y1, random_color.clone());
+            image.display(self.center.x + offset_2, y1, random_color.clone());
+            image.display(self.center.x + offset_1, y2, random_color.clone());
+            image.display(self.center.x + offset_2, y2, random_color.clone());
         }
     }
 }
