@@ -19,8 +19,8 @@ fn main() {
             &gs::Point::new(700, 800),
     );
     triangle.draw(&mut image); */
-    
-    for _ in 0..500 {
+
+    /* for _ in 0..500 {
         gs::Point::random(image.width, image.height).draw(&mut image);
     }
 
@@ -28,11 +28,22 @@ fn main() {
         gs::Line::random(image.width, image.height).draw(&mut image);
         gs::Rectangle::random(image.width, image.height).draw(&mut image);
         gs::Triangle::random(image.width, image.height).draw(&mut image);
-    }
+    } */
 
-    for _ in 0..20 {
+    for _ in 0..3 {
         gs::Circle::random(image.width, image.height).draw(&mut image);
     }
+
+    for _ in 0..5 {
+        gs::Cube::random(image.width, image.height).draw(&mut image);
+    }
+
+    /* let cube = gs::Cube::new(
+        &gs::Point::new(500, 500),
+        &gs::Point::new(250, 700),
+        &gs::Point::new(700, 800),
+    );
+    cube.draw(&mut image); */
 
     raster::save(&image, "image.png").unwrap();
 }

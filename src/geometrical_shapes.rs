@@ -1,3 +1,5 @@
+use std::mem::swap;
+
 use super::*;
 use rand::random_range;
 
@@ -41,6 +43,14 @@ pub struct Rectangle(pub Point, pub Point);
 pub struct Circle {
     pub center: Point,
     pub radius: i32,
+}
+
+#[derive(Debug)]
+pub struct Cube {
+    pub a: Point,
+    pub b: Point,
+    pub c: Point,
+    pub d: Point,
 }
 
 //  ======= Methods =======
@@ -140,6 +150,26 @@ impl Circle {
     }
 }
 
+impl Cube {
+    pub fn new(a: &Point, b: &Point, c: &Point) -> Self {
+        let d = Point::new(a.x + (c.x - b.x), a.y + (c.y - b.y));
+        Self {
+            a: a.clone(),
+            b: b.clone(),
+            c: c.clone(),
+            d,
+        }
+    }
+
+    pub fn random(max_x: i32, max_y: i32) -> Self {
+        Cube::new(
+            &Point::random(max_x, max_y),
+            &Point::random(max_x, max_y),
+            &Point::random(max_x, max_y),
+        )
+    }
+}
+
 //  ======= Implement Drawable =======
 
 impl Drawable for Point {
@@ -206,4 +236,115 @@ impl Drawable for Circle {
             image.display(self.center.x + offset_2, y2, random_color.clone());
         }
     }
+}
+
+impl Drawable for Cube {
+    fn draw<I: Displayable>(&self, image: &mut I) {
+        let random_color = self.color();
+
+        // Diagonals, assign longer one to diag_1
+        let mut diag_1 = Line::new(&self.a, &self.c);
+        let mut diag_2 = Line::new(&self.b, &self.d);
+        let len_d1 =
+            (((diag_1.0.x - diag_1.1.x).pow(2) + (diag_1.0.y - diag_1.1.y).pow(2)) as f64).sqrt();
+        let len_d2 =
+            (((diag_2.0.x - diag_2.1.x).pow(2) + (diag_2.0.y - diag_2.1.y).pow(2)) as f64).sqrt();
+        if len_d2 > len_d1 {
+            swap(&mut diag_1, &mut diag_2);
+        }
+
+        // Midpoint of initial parallelogram
+        let m = Point::new(
+            ((self.a.x as f64 + self.c.x as f64) / 2.0).round() as i32,
+            ((self.a.y as f64 + self.c.y as f64) / 2.0).round() as i32,
+        );
+
+        // Angles between diagonals, assign bigger one to angle_1
+        let mut angle_1 = angle_from_points(&diag_1.0, &m, &diag_2.0); // does order matter?
+        let mut angle_2 = angle_from_points(&diag_2.0, &m, &diag_1.1);
+        if angle_2 > angle_1 {
+            swap(&mut angle_1, &mut angle_2);
+        }
+
+        // Angle from diag_1 and length for height lines
+        let angle_3 = (angle_1 + angle_2) / 2.0;
+        let height = get_cube_height(angle_1, angle_2, len_d1, len_d2);
+
+        // Lines from existing corners
+        let a1b1 = Line::new(&self.a, &self.b);
+        let b1c1 = Line::new(&self.b, &self.c);
+        let c1d1 = Line::new(&self.c, &self.d);
+        let d1a1 = Line::new(&self.d, &self.a);
+
+        // Lines from angle and height
+        let a1a2 = new_line_from_point(&self.a, &diag_1, angle_3, height);
+        let b1b2 = new_line_from_point(&self.b, &diag_1, angle_3, height);
+        let c1c2 = new_line_from_point(&self.c, &diag_1, angle_3, height);
+        let d1d2 = new_line_from_point(&self.d, &diag_1, angle_3, height);
+
+        let lines = vec![a1b1, b1c1, c1d1, d1a1, a1a2, b1b2, c1c2, d1d2];
+        for l in lines {
+            l.draw_with_color(image, random_color.clone());
+        }
+
+    }
+}
+
+// Make these Cube methods
+fn angle_from_points(a: &Point, b: &Point, c: &Point) -> f64 {
+    // Vectors ba and bc
+    let bax = (a.x - b.x) as f64;
+    let bay = (a.y - b.y) as f64;
+    let bcx = (c.x - b.x) as f64;
+    let bcy = (c.y - b.y) as f64;
+
+    // Dot product and magnitudes
+    let dot = bax * bcx + bay * bcy;
+    let mag_ba = (bax * bax + bay * bay).sqrt();
+    let mag_bc = (bcx * bcx + bcy * bcy).sqrt();
+
+    if mag_ba == 0.0 || mag_bc == 0.0 {
+        return 0.0; // Degenerate case: a==b or c==b
+    }
+
+    // Clamp the cosine to [-1, 1] to avoid NaN from floating-point rounding
+    let cos_theta = (dot / (mag_ba * mag_bc)).clamp(-1.0, 1.0);
+
+    cos_theta.acos() // radians in [0, PI]
+}
+
+fn get_cube_height(a1: f64, a2: f64, ld1: f64, ld2: f64) -> f64 {
+    let rot_1 = a1 / a2; // 1 = looking at edge, 0 = looking at plane
+    let base_h = rot_1 * (ld1 / (2.0 as f64).sqrt()) + (1.0 - rot_1) * ld1; // full or partial long diagonal 
+    let rot_2 = ld2 / ld1; // 1 = looking from top, 0 = looking from side
+    (1.0 - rot_2) * base_h
+}
+
+fn new_line_from_point(p: &Point, l: &Line, a: f64, h: f64) -> Line {
+    // direction of reference line
+    let dx = (l.1.x - l.0.x) as f64;
+    let dy = (l.1.y - l.0.y) as f64;
+
+    // normalize
+    let len = (dx * dx + dy * dy).sqrt();
+    if len == 0.0 {
+        panic!("Reference line has zero length");
+    }
+    let ux = dx / len;
+    let uy = dy / len;
+
+    // rotate by angle a
+    let rx = ux * a.cos() - uy * a.sin();
+    let ry = ux * a.sin() + uy * a.cos();
+
+    // scale by h and add to point p
+    let qx = p.x as f64 + h * rx;
+    let qy = p.y as f64 + h * ry;
+
+    let q = Point {
+        x: qx.round() as i32,
+        y: qy.round() as i32,
+    };
+
+    Line(p.clone(), q)
 }
