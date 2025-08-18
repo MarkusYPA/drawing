@@ -1,7 +1,10 @@
+mod cubes;
 mod geometrical_shapes;
+mod polygons;
 
 use geometrical_shapes as gs;
 use gs::{Displayable, Drawable};
+
 use raster::{Color, Image};
 
 fn main() {
@@ -19,20 +22,29 @@ fn main() {
             &gs::Point::new(700, 800),
     );
     triangle.draw(&mut image); */
-    
-    for _ in 0..500 {
+
+    for _ in 0..300 {
         gs::Point::random(image.width, image.height).draw(&mut image);
     }
 
-    for _ in 0..4 {
+    for _ in 0..2 {
         gs::Line::random(image.width, image.height).draw(&mut image);
         gs::Rectangle::random(image.width, image.height).draw(&mut image);
         gs::Triangle::random(image.width, image.height).draw(&mut image);
     }
 
-    for _ in 0..20 {
+    for _ in 0..6 {
         gs::Circle::random(image.width, image.height).draw(&mut image);
     }
+
+    for _ in 0..5 {
+        let p = polygons::Polygon::random(image.width, image.height);
+        p.draw(&mut image);
+    }
+
+    /* for _ in 0..3 {
+        cubes::Cube::random(image.width, image.height).draw(&mut image);
+    } */
 
     raster::save(&image, "image.png").unwrap();
 }

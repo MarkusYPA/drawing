@@ -64,7 +64,7 @@ impl Line {
         Line::new(&Point::random(max_x, max_y), &Point::random(max_x, max_y))
     }
 
-    fn draw_with_color<I: Displayable>(&self, image: &mut I, color: Color) {
+    pub fn draw_with_color<I: Displayable>(&self, image: &mut I, color: Color) {
         let x_length = self.1.x - self.0.x;
         let y_length = self.1.y - self.0.y;
         let is_steep = y_length.abs() > x_length.abs();
