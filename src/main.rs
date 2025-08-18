@@ -5,8 +5,6 @@ mod polygons;
 use geometrical_shapes as gs;
 use gs::{Displayable, Drawable};
 
-//use cubes::*;
-
 use raster::{Color, Image};
 
 fn main() {
