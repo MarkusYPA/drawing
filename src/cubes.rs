@@ -1,6 +1,5 @@
 use super::*;
-use geometrical_shapes as gs;
-use gs::{Point, Line};
+use geometrical_shapes::{Point, Line};
 
 use rand::random_range;
 use std::mem::swap;
