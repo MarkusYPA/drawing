@@ -1,7 +1,12 @@
 mod geometrical_shapes;
+mod cubes;
 
 use geometrical_shapes as gs;
 use gs::{Displayable, Drawable};
+
+//use cubes::*;
+
+
 use raster::{Color, Image};
 
 fn main() {
@@ -35,10 +40,10 @@ fn main() {
     }
 
     for _ in 0..3 {
-        gs::Cube::random(image.width, image.height).draw(&mut image);
+        cubes::Cube::random(image.width, image.height).draw(&mut image);
     }
 
-    /* let cube = gs::Cube::new(
+    /* let cube = cubes::Cube::new(
         &gs::Point::new(500, 500),
         &gs::Point::new(250, 700),
         &gs::Point::new(700, 800),
