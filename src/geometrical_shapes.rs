@@ -1,21 +1,18 @@
 use super::*;
 use rand::random_range;
 
-fn random_color() -> Color {
-    Color {
-        r: random_range(0..=255),
-        g: random_range(0..=255),
-        b: random_range(0..=255),
-        a: 255,
-    }
-}
 //  ======= Traits =======
 
 pub trait Drawable {
     fn draw<I: Displayable>(&self, image: &mut I);
 
     fn color(&self) -> Color {
-        random_color()
+        Color {
+            r: random_range(0..=255),
+            g: random_range(0..=255),
+            b: random_range(0..=255),
+            a: 255,
+        }
     }
 }
 
@@ -91,13 +88,13 @@ impl Line {
             for x in start.x..=end.x {
                 let completion = (x as f64 - start.x as f64) / (end.x - start.x) as f64;
                 let y = completion * (end.y - start.y) as f64 + start.y as f64;
-                image.display(x, y as i32, color.clone());
+                image.display(x, y.round() as i32, color.clone());
             }
         } else {
             for y in start.y..=end.y {
                 let completion = (y as f64 - start.y as f64) / (end.y - start.y) as f64;
                 let x = completion * (end.x - start.x) as f64 + start.x as f64;
-                image.display(x as i32, y, color.clone());
+                image.display(x.round() as i32, y, color.clone());
             }
         }
     }
@@ -115,12 +112,6 @@ impl Triangle {
             &Point::random(max_x, max_y),
         )
     }
-
-    fn draw_with_color<I: Displayable>(&self, image: &mut I, color: Color) {
-        Line::new(&self.0, &self.1).draw_with_color(image, color.clone());
-        Line::new(&self.1, &self.2).draw_with_color(image, color.clone());
-        Line::new(&self.2, &self.0).draw_with_color(image, color.clone());
-    }
 }
 
 impl Rectangle {
@@ -130,18 +121,6 @@ impl Rectangle {
 
     pub fn random(max_x: i32, max_y: i32) -> Self {
         Rectangle::new(&Point::random(max_x, max_y), &Point::random(max_x, max_y))
-    }
-
-    fn draw_with_color<I: Displayable>(&self, image: &mut I, color: Color) {
-        let a = &self.0;
-        let b = &Point::new(self.0.x, self.1.y);
-        let c = &self.1;
-        let d = &Point::new(self.1.x, self.0.y);
-
-        Line::new(a, b).draw_with_color(image, color.clone());
-        Line::new(b, c).draw_with_color(image, color.clone());
-        Line::new(c, d).draw_with_color(image, color.clone());
-        Line::new(d, a).draw_with_color(image, color.clone());
     }
 }
 
@@ -177,48 +156,54 @@ impl Drawable for Line {
 
 impl Drawable for Triangle {
     fn draw<I: Displayable>(&self, image: &mut I) {
-        let color = self.color();
-        self.draw_with_color(image, color);
+        let random_color = self.color();
+
+        Line::new(&self.0, &self.1).draw_with_color(image, random_color.clone());
+        Line::new(&self.1, &self.2).draw_with_color(image, random_color.clone());
+        Line::new(&self.2, &self.0).draw_with_color(image, random_color.clone());
     }
 }
 
 impl Drawable for Rectangle {
     fn draw<I: Displayable>(&self, image: &mut I) {
-        let color = self.color();
-        self.draw_with_color(image, color);
+        let random_color = self.color();
+
+        let a = &self.0;
+        let b = &Point::new(self.0.x, self.1.y);
+        let c = &self.1;
+        let d = &Point::new(self.1.x, self.0.y);
+
+        Line::new(a, b).draw_with_color(image, random_color.clone());
+        Line::new(b, c).draw_with_color(image, random_color.clone());
+        Line::new(c, d).draw_with_color(image, random_color.clone());
+        Line::new(d, a).draw_with_color(image, random_color.clone());
     }
 }
 
 impl Drawable for Circle {
     fn draw<I: Displayable>(&self, image: &mut I) {
-        let color = self.color();
+        let random_color = self.color();
+        let steps = (self.radius as f64 / (2.0 as f64).sqrt()) as i32;
 
-        // draw upper and lower quarters of circle
-        let (start_x, end_x) = (
-            (self.center.x as f64 - self.radius as f64 / (2.0 as f64).sqrt()) as i32,
-            (self.center.x as f64 + self.radius as f64 / (2.0 as f64).sqrt()) as i32,
-        );
-        for x in start_x..=end_x {
-            let x_now = x - self.center.x;
-            let y1 = ((self.radius.pow(2) - x_now.pow(2)) as f64).sqrt();
-            let y2 = y1 * -1.0;
+        for s in 0..=steps {
+            let offset_1 = ((self.radius.pow(2) - s.pow(2)) as f64).sqrt().round() as i32;
+            let offset_2 = offset_1 * -1;
 
-            image.display(x, y1 as i32 + self.center.y, color.clone());
-            image.display(x, y2 as i32 + self.center.y, color.clone());
-        }
+            // top and bottom quarters of circle
+            let x1 = self.center.x + s;
+            let x2 = self.center.x - s;
+            image.display(x1, self.center.y + offset_1, random_color.clone());
+            image.display(x1, self.center.y + offset_2, random_color.clone());
+            image.display(x2, self.center.y + offset_1, random_color.clone());
+            image.display(x2, self.center.y + offset_2, random_color.clone());
 
-        // draw left and right quarters of circle
-        let (start_y, end_y) = (
-            (self.center.y as f64 - self.radius as f64 / (2.0 as f64).sqrt()) as i32,
-            (self.center.y as f64 + self.radius as f64 / (2.0 as f64).sqrt()) as i32,
-        );
-        for y in start_y..=end_y {
-            let y_now = y - self.center.y;
-            let x1 = ((self.radius.pow(2) - y_now.pow(2)) as f64).sqrt();
-            let x2 = x1 * -1.0;
-
-            image.display(x1 as i32 + self.center.x, y, color.clone());
-            image.display(x2 as i32 + self.center.x, y, color.clone());
+            // left and right quarters of circle
+            let y1 = self.center.y + s;
+            let y2 = self.center.y - s;
+            image.display(self.center.x + offset_1, y1, random_color.clone());
+            image.display(self.center.x + offset_2, y1, random_color.clone());
+            image.display(self.center.x + offset_1, y2, random_color.clone());
+            image.display(self.center.x + offset_2, y2, random_color.clone());
         }
     }
 }
